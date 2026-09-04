@@ -438,7 +438,7 @@ function fallbackCopy(output, note){
 
 document.getElementById('outlookBtn').addEventListener('click', function(){
   const subject = 'URGENT MANUAL TICKET NEEDED | MISFIRE SE MONITORING ALERT';
-  const intro = 'A manual ticket needs to be opened against the following information as monitoring alert has come through and did not properly generate the incident.';
+  const intro = 'A manual ticket needs to be opened against the following information as a monitoring alert has come through and did not properly generate the incident.';
   const body = intro + '\n\n' + linesToPlainText(buildLines());
   const mailto = 'mailto:' + encodeURIComponent(OUTLOOK_TO_ADDRESS)
     + '?cc=' + encodeURIComponent(OUTLOOK_CC_ADDRESS)
