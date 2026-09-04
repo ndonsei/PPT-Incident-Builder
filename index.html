@@ -310,6 +310,7 @@ function buildLines(){
   const contact = val('contact');
   const email = val('email');
   const phone = val('phone');
+  const serial = val('serial');
   const address = val('address');
   const city = val('city');
   const zip = val('zip');
@@ -322,6 +323,7 @@ function buildLines(){
   // Uppercase labels make the plain-text Outlook message easier to scan.
   const accountLine = agreement ? company + ' (SE AGREEMENT: ' + agreement + ')' : company;
   lines.push({label:'ACCOUNT NAME:', value: accountLine});
+  lines.push({label:'PRODUCT SERIAL NUMBER:', value: serial});
   lines.push({label:'CALLER NAME:', value: 'SE Monitoring Alert'});
   lines.push({label:'PHONE:', value: 'No Phone'});
   lines.push({label:'EMAIL:', value: 'Monitoring Alert: ' + link});
