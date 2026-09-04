@@ -305,6 +305,7 @@ function esc(str){
 // or {plain: text} (a plain line with no bold label, e.g. address lines).
 function buildLines(){
   const company = val('company');
+  const agreement = val('agreement');
   const link = val('link');
   const contact = val('contact');
   const email = val('email');
@@ -319,7 +320,8 @@ function buildLines(){
   const lines = [];
 
   // Uppercase labels make the plain-text Outlook message easier to scan.
-  lines.push({label:'ACCOUNT NAME:', value: company});
+  const accountLine = agreement ? company + ' (SE AGREEMENT: ' + agreement + ')' : company;
+  lines.push({label:'ACCOUNT NAME:', value: accountLine});
   lines.push({label:'CALLER NAME:', value: 'SE Missed Monitoring Alert'});
   lines.push({label:'PHONE:', value: 'No Phone'});
   lines.push({label:'EMAIL:', value: 'Monitoring Alert: ' + link});
