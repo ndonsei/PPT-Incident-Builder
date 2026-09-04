@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Incident Summary Builder</title>
+<style>
+  :root{
+    --ink:#1c2b2f;
+    --paper:#f6f4ef;
+    --panel:#ffffff;
+    --line:#d8d3c6;
+    --accent:#2f5d55;
+    --accent-dim:#e7ede9;
+    --mono: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:var(--sans);
+    padding:32px 16px 64px;
+  }
+  .wrap{
+    max-width:760px;
+    margin:0 auto;
+  }
+  header{
+    margin-bottom:28px;
+    border-bottom:2px solid var(--ink);
+    padding-bottom:14px;
+  }
+  h1{
+    font-size:22px;
+    margin:0 0 4px;
+    letter-spacing:0.2px;
+  }
+  header p{
+    margin:0;
+    font-size:13.5px;
+    color:#5a6a67;
+  }
+  form{
+    background:var(--panel);
+    border:1px solid var(--line);
+    padding:24px;
+  }
+  .field{
+    margin-bottom:16px;
+  }
+  .field:last-child{margin-bottom:0;}
+  label{
+    display:block;
+    font-size:12.5px;
+    font-weight:600;
+    margin-bottom:5px;
+    color:#3a4644;
+  }
+  input[type=text], textarea{
+    width:100%;
+    padding:9px 10px;
+    border:1px solid var(--line);
+    background:#fdfcfa;
+    font-family:var(--sans);
+    font-size:14px;
+    color:var(--ink);
+    border-radius:2px;
+  }
+  input[type=text]:focus, textarea:focus{
+    outline:none;
+    border-color:var(--accent);
+    background:#fff;
+  }
+  textarea{
+    min-height:70px;
+    resize:vertical;
+  }
+  .row2{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:16px;
+  }
+  @media (max-width:520px){
+    .row2{grid-template-columns:1fr;}
+  }
+  .actions{
+    margin-top:22px;
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+  }
+  button{
+    font-family:var(--sans);
+    font-size:13.5px;
+    font-weight:600;
+    padding:10px 18px;
+    border:1px solid var(--accent);
+    background:var(--accent);
+    color:#fff;
+    cursor:pointer;
+    border-radius:2px;
+  }
+  button.secondary{
+    background:transparent;
+    color:var(--accent);
+  }
+  button:hover{opacity:0.88;}
+  .output-section{
+    margin-top:28px;
+  }
+  .output-section h2{
+    font-size:14px;
+    margin:0 0 10px;
+    color:#3a4644;
+  }
+  #output{
+    white-space:pre-wrap;
+    background:#1c2b2f;
+    color:#eef3ee;
+    font-family:var(--mono);
+    font-size:13.5px;
+    line-height:1.6;
+    padding:18px;
+    border-radius:3px;
+    min-height:60px;
+  }
+  #output strong{
+    color:#9fe3c9;
+    font-weight:700;
+  }
+  .copy-note{
+    font-size:12px;
+    color:#5a6a67;
+    margin-top:8px;
+    min-height:16px;
+  }
+  .req{
+    color:#a4553f;
+  }
+  .helper-link{
+    display:none;
+    margin-top:6px;
+    font-size:12.5px;
+  }
+  .helper-link a{
+    color:var(--accent);
+    text-decoration:none;
+    border-bottom:1px solid var(--accent);
+  }
+  .helper-link a:hover{
+    opacity:0.8;
+  }
+  .teams-btn{
+    display:inline-flex;
+    align-items:center;
+    font-family:var(--sans);
+    font-size:13.5px;
+    font-weight:600;
+    padding:10px 18px;
+    border:1px solid #5b5fc7;
+    background:#5b5fc7;
+    color:#fff;
+    border-radius:2px;
+    text-decoration:none;
+    cursor:pointer;
+  }
+  .teams-btn:hover{
+    opacity:0.88;
+  }
+  .outlook-btn{
+    display:inline-flex;
+    align-items:center;
+    font-family:var(--sans);
+    font-size:13.5px;
+    font-weight:600;
+    padding:10px 18px;
+    border:1px solid #0078d4;
+    background:#0078d4;
+    color:#fff;
+    border-radius:2px;
+    text-decoration:none;
+    cursor:pointer;
+  }
+  .outlook-btn:hover{
+    opacity:0.88;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Incident Summary Builder</h1>
+    <p>Fill in the fields below, then generate a structured ticket summary. Works fully offline.</p>
+  </header>
+
+  <form id="form" autocomplete="off">
+    <div class="row2">
+      <div class="field">
+        <label for="company">Company Name <span class="req">*</span></label>
+        <input type="text" id="company">
+      </div>
+      <div class="field">
+        <label for="agreement">SE Agreement #</label>
+        <input type="text" id="agreement">
+        <div class="helper-link" id="agreementLinkWrap"><a id="agreementLink" href="#" target="_blank" rel="noopener">View Agreement</a></div>
+      </div>
+    </div>
+
+    <div class="row2">
+      <div class="field">
+        <label for="city">Location (City, State)</label>
+        <input type="text" id="city">
+      </div>
+      <div class="field">
+        <label for="address">Location Address</label>
+        <input type="text" id="address">
+      </div>
+    </div>
+
+    <div class="row2">
+      <div class="field">
+        <label for="zip">Location Zip</label>
+        <input type="text" id="zip">
+      </div>
+      <div class="field">
+        <label for="serial">System Serial Number</label>
+        <input type="text" id="serial">
+      </div>
+    </div>
+
+    <div class="row2">
+      <div class="field">
+        <label for="contact">Contact Name</label>
+        <input type="text" id="contact">
+      </div>
+      <div class="field">
+        <label for="email">Contact Email</label>
+        <input type="text" id="email">
+      </div>
+    </div>
+
+    <div class="row2">
+      <div class="field">
+        <label for="phone">Contact Phone Number</label>
+        <input type="text" id="phone">
+      </div>
+      <div class="field">
+        <label for="manufacturer">Device Manufacturer</label>
+        <input type="text" id="manufacturer">
+      </div>
+    </div>
+
+    <div class="field">
+      <label for="model">Device Model</label>
+      <input type="text" id="model">
+    </div>
+
+    <div class="field">
+      <label for="problem">Problem Description</label>
+      <textarea id="problem"></textarea>
+    </div>
+
+    <div class="field">
+      <label for="link">Incident Link</label>
+      <input type="text" id="link" placeholder="https://alerting.seitrakker.com/incidents/12345">
+      <div class="helper-link" id="incidentLinkWrap"><a id="incidentLink" href="#" target="_blank" rel="noopener">View Incident</a></div>
+    </div>
+
+    <div class="actions">
+      <button type="button" id="generateBtn">Generate summary</button>
+      <button type="button" id="clearBtn" class="secondary">Clear form</button>
+    </div>
+  </form>
+
+  <div class="output-section">
+    <h2>Structured summary</h2>
+    <div id="output">Fill in the form above and click "Generate summary."</div>
+    <div class="actions">
+      <button type="button" id="copyBtn" class="secondary">Copy to clipboard</button>
+      <a id="teamsBtn" class="teams-btn" href="https://teams.microsoft.com/l/chat/19:a50ba36413354b97bb03ca44204cdfdf@thread.v2/conversations?context=%7B%22contextType%22%3A%22chat%22%7D" target="_blank" rel="noopener">Open Alert Hub Misfires chat</a>
+      <button type="button" id="outlookBtn" class="outlook-btn">Open in Outlook</button>
+    </div>
+    <div class="copy-note" id="copyNote"></div>
+  </div>
+</div>
+
+<script>
+// TODO: fill in the ticket recipient address once you have it.
+const OUTLOOK_TO_ADDRESS = '';
+
+function val(id){
+  return document.getElementById(id).value.trim();
+}
+
+function esc(str){
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+// Builds the ordered list of lines for the ticket.
+// Each entry is either {label, value} (label bold, value plain, on one line),
+// or {plain: text} (a plain line with no bold label, e.g. address lines).
+function buildLines(){
+  const company = val('company');
+  const link = val('link');
+  const contact = val('contact');
+  const email = val('email');
+  const phone = val('phone');
+  const address = val('address');
+  const city = val('city');
+  const zip = val('zip');
+  const problem = val('problem');
+  const manufacturer = val('manufacturer');
+  const model = val('model');
+
+  const lines = [];
+
+  // Uppercase labels make the plain-text Outlook message easier to scan.
+  lines.push({label:'ACCOUNT NAME:', value: company});
+  lines.push({label:'CALLER NAME:', value: 'SE Missed Monitoring Alert'});
+  lines.push({label:'PHONE:', value: 'No Phone'});
+  lines.push({label:'EMAIL:', value: 'Monitoring Alert: ' + link});
+  lines.push({blank:true});
+
+  lines.push({label:'SITE CONTACT:', value: ''});
+  lines.push({label:'CONTACT NAME:', value: contact});
+  lines.push({label:'CONTACT EMAIL:', value: email});
+  if(phone) lines.push({label:'CONTACT PHONE:', value: phone});
+  lines.push({blank:true});
+
+  lines.push({label:'SITE LOCATION:', value: ''});
+  if(address) lines.push({plain: address});
+  if(city) lines.push({plain: city});
+  if(zip) lines.push({plain: zip});
+  lines.push({blank:true});
+
+  // Long fields put their response on the following line.
+  lines.push({label:'CUSTOMER WOULD LIKE SERVICE WITHIN SLA/CUSTOMER DEFERRED SERVICE:', value:'SLA missed due to error in transmission to Park Place', multiline:true});
+  lines.push({blank:true});
+  lines.push({label:'FE REQUIRED:', value: 'Please check with customer'});
+  lines.push({label:'DOES SITE ACCEPT DELIVERIES:', value: 'Unknown'});
+  lines.push({label:'SITES HOURS OF OPERATION:', value: 'Unknown'});
+  lines.push({label:'PART NUMBERS / SPECS:', value: 'Unknown'});
+  lines.push({blank:true});
+  lines.push({label:'FAILURE DESCRIPTION:', value: problem, multiline:true});
+  lines.push({blank:true});
+  const product = [manufacturer, model].filter(Boolean).join(' / ');
+  lines.push({label:'PRODUCT FAMILY AND PRODUCT TYPE:', value: product, multiline:true});
+
+  return lines;
+}
+
+function linesToHtml(lines){
+  return lines.map(function(l){
+    if(l.blank) return '';
+    if(l.plain !== undefined) return esc(l.plain);
+    if(l.multiline){
+      return '<strong>' + esc(l.label) + '</strong>' + (l.value ? '<br>' + esc(l.value) : '');
+    }
+    const value = l.value ? (' ' + esc(l.value)) : '';
+    return '<strong>' + esc(l.label) + '</strong>' + value;
+  }).join('<br>');
+}
+
+function linesToPlainText(lines){
+  return lines.map(function(l){
+    if(l.blank) return '';
+    if(l.plain !== undefined) return l.plain;
+    if(l.multiline) return l.value ? (l.label + '\n' + l.value) : l.label;
+    return l.value ? (l.label + ' ' + l.value) : l.label;
+  }).join('\n');
+}
+
+function generate(){
+  const lines = buildLines();
+  document.getElementById('output').innerHTML = linesToHtml(lines);
+  document.getElementById('copyNote').textContent = '';
+}
+
+document.getElementById('generateBtn').addEventListener('click', generate);
+
+document.getElementById('clearBtn').addEventListener('click', function(){
+  document.getElementById('form').reset();
+  document.getElementById('output').textContent = 'Fill in the form above and click "Generate summary."';
+  document.getElementById('copyNote').textContent = '';
+  updateAgreementLink();
+  updateIncidentLink();
+});
+
+document.getElementById('copyBtn').addEventListener('click', async function(){
+  const output = document.getElementById('output');
+  const note = document.getElementById('copyNote');
+  if(!output.textContent || output.textContent.indexOf('Fill in the form') === 0){
+    note.textContent = 'Nothing to copy yet — generate a summary first.';
+    return;
+  }
+  const html = output.innerHTML;
+  const text = linesToPlainText(buildLines());
+
+  try{
+    if(navigator.clipboard && window.ClipboardItem){
+      const item = new ClipboardItem({
+        'text/html': new Blob([html], {type:'text/html'}),
+        'text/plain': new Blob([text], {type:'text/plain'})
+      });
+      await navigator.clipboard.write([item]);
+      note.textContent = 'Copied to clipboard (with bold labels).';
+      return;
+    }
+  }catch(e){
+    // fall through to selection-based fallback
+  }
+  fallbackCopy(output, note);
+});
+
+function fallbackCopy(output, note){
+  try{
+    const range = document.createRange();
+    range.selectNodeContents(output);
+    const sel = window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(range);
+    document.execCommand('copy');
+    sel.removeAllRanges();
+    note.textContent = 'Copied to clipboard.';
+  }catch(e){
+    note.textContent = 'Could not copy automatically — select the text above and copy manually.';
+  }
+}
+
+document.getElementById('outlookBtn').addEventListener('click', function(){
+  const subject = 'SE MONITORING TICKET NEEDED';
+  const intro = 'A manual ticket needs to be opened against the following information as monitoring alert has come through and did not properly generate the incident.';
+  const body = intro + '\n\n' + linesToPlainText(buildLines());
+  const mailto = 'mailto:' + encodeURIComponent(OUTLOOK_TO_ADDRESS)
+    + '?subject=' + encodeURIComponent(subject)
+    + '&body=' + encodeURIComponent(body);
+  window.location.href = mailto;
+});
+
+function normalizeUrl(raw){
+  if(!/^https?:\/\//i.test(raw)){
+    return 'https://' + raw;
+  }
+  return raw;
+}
+
+function updateAgreementLink(){
+  const agreement = val('agreement');
+  const wrap = document.getElementById('agreementLinkWrap');
+  const a = document.getElementById('agreementLink');
+  if(agreement){
+    const url = 'https://www.seitrakker.com/intranet/tonline2/agreeagreementmain.asp?SesVarName1=AgreeAgreementCurrentAgreement&SesVarValue1=' + encodeURIComponent(agreement);
+    a.href = url;
+    wrap.style.display = 'block';
+  } else {
+    wrap.style.display = 'none';
+  }
+}
+
+function updateIncidentLink(){
+  const link = val('link');
+  const wrap = document.getElementById('incidentLinkWrap');
+  const a = document.getElementById('incidentLink');
+  if(link){
+    a.href = normalizeUrl(link);
+    wrap.style.display = 'block';
+  } else {
+    wrap.style.display = 'none';
+  }
+}
+
+document.getElementById('agreement').addEventListener('input', updateAgreementLink);
+document.getElementById('link').addEventListener('input', updateIncidentLink);
+
+// Generate live as fields change, for convenience
+['company','agreement','city','address','zip','serial','contact','email','phone','manufacturer','model','problem','link'].forEach(function(id){
+  document.getElementById(id).addEventListener('input', generate);
+});
+</script>
+</body>
+</html>
