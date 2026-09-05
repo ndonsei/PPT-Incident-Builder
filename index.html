@@ -280,6 +280,7 @@
     <div class="actions">
       <button type="button" id="copyBtn" class="secondary">Copy to clipboard</button>
       <a id="teamsBtn" class="teams-btn" href="https://teams.microsoft.com/l/chat/19:a50ba36413354b97bb03ca44204cdfdf@thread.v2/conversations?context=%7B%22contextType%22%3A%22chat%22%7D" target="_blank" rel="noopener">Open Alert Hub Misfires chat</a>
+      <a id="rachilTeamsBtn" class="teams-btn" href="https://teams.microsoft.com/l/chat/19:410b07288c35443f9904f515c3e1e716@thread.v2/conversations?context=%7B%22contextType%22%3A%22chat%22%7D" target="_blank" rel="noopener">Open chat with Rachil</a>
       <button type="button" id="outlookBtn" class="outlook-btn">Open in Outlook</button>
     </div>
     <div class="copy-note" id="copyNote"></div>
@@ -289,7 +290,7 @@
 <script>
 // TODO: fill in the ticket recipient address once you have it.
 const OUTLOOK_TO_ADDRESS = 'rarceneaux2@parkplacetech.com';
-const OUTLOOK_CC_ADDRESS = 'nick.donegon@parkplacetech.com;james.woolley@parkplacetech.com;jim.sweetman@parkplacetech.com';
+const OUTLOOK_CC_ADDRESS = 'nick.donegon@parkplacetech.com;james.woolley@parkplacetech.com';
 
 function val(id){
   return document.getElementById(id).value.trim();
@@ -437,8 +438,8 @@ function fallbackCopy(output, note){
 }
 
 document.getElementById('outlookBtn').addEventListener('click', function(){
-  const subject = 'URGENT MANUAL TICKET NEEDED | MISFIRE SE MONITORING ALERT';
-  const intro = 'A manual ticket needs to be opened against the following information as a monitoring alert has come through and did not properly generate the incident.';
+  const subject = 'MANUAL TICKET NEEDED | MISFIRE SE MONITORING ALERT';
+  const intro = 'A manual ticket needs to be opened against the following information as monitoring alert has come through and did not properly generate the incident.';
   const body = intro + '\n\n' + linesToPlainText(buildLines());
   const mailto = 'mailto:' + encodeURIComponent(OUTLOOK_TO_ADDRESS)
     + '?cc=' + encodeURIComponent(OUTLOOK_CC_ADDRESS)
@@ -489,5 +490,3 @@ document.getElementById('link').addEventListener('input', updateIncidentLink);
 </script>
 </body>
 </html>
-PPT-Incident-Builder-email-addresses.html
-HTML
